@@ -3,7 +3,7 @@ import {SQLite} from "expo-sqlite"
 const DB = SQLite.openDatabase("places.db")
 
 export const initialize = () => {
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         // We need to create a table that will store the references
         DB.transaction((transaction => {
             transaction.executeSql(
@@ -18,6 +18,39 @@ export const initialize = () => {
             )
         }))
     })
+}
 
-    return promise
+
+export const insertPlace = (title, imageUri, address,latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+        DB.transaction((transaction => {
+            transaction.executeSql(
+                'INSERT INTO places (title, imageUri, address, latitude, longitude) VALUES (?, ? , ? , ? , ?);',
+                [title, imageUri, address, latitude, longitude],
+                (_, success) => {
+                    resolve(success)
+                },
+                (_, error) => {
+                    reject(error)
+                }
+            )
+        }))
+    })
+}
+
+export const fetchPlaces = () => {
+    return new Promise((resolve, reject) => {
+        DB.transaction((transaction => {
+            transaction.executeSql(
+                "SELECT * FROM places",
+                [title, imageUri, address, latitude, longitude],
+                (_, success) => {
+                    resolve(success)
+                },
+                (_, error) => {
+                    reject(error)
+                }
+            )
+        }))
+    })
 }

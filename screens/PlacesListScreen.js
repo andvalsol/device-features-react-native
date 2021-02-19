@@ -1,14 +1,21 @@
-import React from "react"
-import {View, Text, StyleSheet, FlatList} from "react-native"
-import {HeaderButton, HeaderButtons, Item} from "react-navigation-header-buttons"
-import CustomHeaderButton from "../components/HeaderButton"
+import React, {useEffect}from "react"
+import {StyleSheet, FlatList} from "react-native"
+import {HeaderButtons, Item} from "react-navigation-header-buttons"
+import * as CustomHeaderButton from "../components/HeaderButton"
 import {Platform} from "react-native-web"
-import {useSelector} from "react-redux"
+import {useSelector, useDispatch} from "react-redux"
 import PlaceItem from "../components/PlaceItem"
+import * as Places from "../store/actions/places"
 
 
 const PlacesListScreen = (props) => {
     const places = useSelector((state) => state.places.places) // Because the root reducer uses places and the initial state is called places
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(Places.loadPlaces())
+    }, [dispatch])
 
     const selectPlaceItemHandler = (itemData) => {
         props.navigation.navigate("PlaceDetailScreen", {
@@ -27,7 +34,7 @@ const PlacesListScreen = (props) => {
                         onSelect={selectPlaceItemHandler.bind(this, itemData)}
                         title={itemData.item.title}
                         imageUri={itemData.item.imageUri}
-                        address={null}/>
+                        address={itemData.item.address}/>
                 )
             }}/>
     )
@@ -38,7 +45,7 @@ PlacesListScreen.navigationOptions = (navigationData) => {
         headerTitle: "All places",
         headerRight: (
             <HeaderButtons
-                HeaderButtonComponent={HeaderButton}>
+                HeaderButtonComponent={CustomHeaderButton}>
                 <Item
                     title="Add place"
                     iconName={
